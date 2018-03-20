@@ -23,7 +23,7 @@ public class Game {
 	}
 	
 	public void sendTurn(int player, int button) {
-		board.set((button - 1) / 3, (button - 1) % 3, player);
+		board.set(button, player);
 	}
 	
 	public boolean checkWin(int player) {
@@ -44,7 +44,11 @@ public class Game {
 	}
 	
 	public boolean isSquareEmpty(int square) {
-		return (!board.isTaken((square - 1) / 3, (square - 1) % 3));
+		return (!board.isTaken(square));
+	}
+	
+	public char[] getBoard() {
+		return board.getBoard();
 	}
 	
 	public void printBoard() {

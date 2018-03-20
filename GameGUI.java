@@ -21,6 +21,7 @@ public class GameGUI extends JFrame implements ActionListener {
 
 	private Game game;
 	private String mode;
+	private Population p;
 	
 	private Image x_img;
 	private Image o_img;	
@@ -122,12 +123,6 @@ public class GameGUI extends JFrame implements ActionListener {
 		setVisible(true);
 		
 		setup();
-		Population p = new Population(10);
-		for (int i = 0; i < 10; i++) {
-			System.out.println("Generation: " + (i+1));
-			p.evolve();
-			p.printScores();
-		}
 	}
 	
 	public void setup() {
@@ -213,26 +208,70 @@ public class GameGUI extends JFrame implements ActionListener {
 			else if (!game.isEmpty())
 				setLabel("You can only switch modes at the beginning of the game.");
 			else {
-				setLabel("NOT YET IMPLEMENTED");
+				mode = "ai";
+				p = new Population(20);
+				p.printScores();
+				for (int i = 0; i < 1000; i++) {
+					System.out.println("Generation: " + (i+1));
+					p.evolve();
+					//p.printScores();
+				}
 			}
 		}
 		else {	// It is a game tile (1-9)
 			
-			
-			// Set button press
-			int buttonNum = Integer.parseInt(command);
-			setButton(buttons[buttonNum - 1], buttonNum);
-			game.sendTurn(game.getPlayer(), buttonNum);
-			
-			// Check for end of game
-			if (game.checkWin(game.getPlayer()) || game.isFull()) {
-				endCurrentGame();
-				return;
+			if (mode == "human") {
+				// Set button press
+				int buttonNum = Integer.parseInt(command);
+				setButton(buttons[buttonNum - 1], buttonNum);
+				game.sendTurn(game.getPlayer(), buttonNum);
+				
+				// Check for end of game
+				if (game.checkWin(game.getPlayer()) || game.isFull()) {
+					endCurrentGame();
+					return;
+				}
+							
+				game.advancePlayer();
+				System.out.println("Player " + game.getPlayer() + "'s turn.");
+				setLabel("Player " + game.getPlayer() + "'s turn.");
 			}
-						
-			game.advancePlayer();
-			System.out.println("Player " + game.getPlayer() + "'s turn.");
-			setLabel("Player " + game.getPlayer() + "'s turn.");
+			else {
+				if (game.getPlayer() == 1) {
+					int buttonNum = Integer.parseInt(command);
+					setButton(buttons[buttonNum - 1], buttonNum);
+					game.sendTurn(game.getPlayer(), buttonNum);
+					
+					// Check for end of game
+					if (game.checkWin(game.getPlayer()) || game.isFull()) {
+						endCurrentGame();
+						return;
+					}
+								
+					game.advancePlayer();
+					System.out.println("Player " + game.getPlayer() + "'s turn.");
+					setLabel("Player " + game.getPlayer() + "'s turn.");
+					
+					// AI
+					System.out.println("Finding move response");
+					int response = p.findResponse(game.getBoard());
+					if (response == -1)
+						System.out.println("ERROR COULD NOT FIND RESPONSE");
+					System.out.println("Found move " + response);
+					
+					setButton(buttons[response - 1], response);
+					game.sendTurn(2, response);
+					
+					if (game.checkWin(game.getPlayer()) || game.isFull()) {
+						endCurrentGame();
+						return;
+					}
+					game.advancePlayer();
+					System.out.println("Player " + game.getPlayer() + "'s turn.");
+					setLabel("Player " + game.getPlayer() + "'s turn.");
+				}
+					
+			}
 		}
 		
 	}

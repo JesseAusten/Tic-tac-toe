@@ -1,52 +1,48 @@
 
 public class Population {
 	private Combos c[];
-	private int score[];
 	private int size;
 	
 	public Population(int size) {
 		this.size = size;
 		c = new Combos[size];
-		score = new int[size];
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++)
 			c[i] = new Combos();
-			score[i] = c[i].getScore();
-			System.out.println("Score for member " + i + ": " + score[i]);
-		}
 	}
 	
 	public int getScore(int num) {
-		return score[num];
+		return c[num].getScore();
 	}
 	
-	public int bestScoreIndex() {
+	public int getBestScoreIndex() {
 		int best = 0;
 		for (int i = 0; i < size; i++)
-			if (score[i] > score[best])
+			if (c[i].getScore() > c[best].getScore())
 				best = i;
-		System.out.println("Best score is: " + score[best]);
+		System.out.println("Best score is: " + c[best].getScore());
 		return best;
 	}
 	
-	public void generateElement(int index) {
+	private void generateElement(int index) {
 		c[index] = new Combos();
-		score[index] = c[index].getScore();
 	}
 	
 	public void evolve() {
-		Combos bestCombo = c[bestScoreIndex()];
-		for (int i = 0; i < size; i++)
-			if (i % 2 == 0) {
+		Combos bestCombo = c[getBestScoreIndex()];
+		c[0] = bestCombo;
+		for (int i = 1; i < size; i++) {
 				c[i] = new Combos(bestCombo);
-				score[i] = c[i].getScore();
-			}
-			else
-				generateElement(i);
+				c[i].mutateResponse(100);
+		}
 	}
 	
+	public int findResponse(char[] inputBoard) {
+		Combos best = c[getBestScoreIndex()];
+		return best.findResponse(inputBoard);
+	}
 	public void printScores() {
 		System.out.print("Scores: ");
 		for (int i = 0; i < size; i++)
-			System.out.print(score[i] + ", ");
+			System.out.print(c[i].getScore() + ", ");
 	}
 }
